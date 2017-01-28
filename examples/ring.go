@@ -13,7 +13,7 @@ import (
 const (
 	rate = 8000
 	freq = 400
-	sec = 2
+	sec  = 2
 )
 
 func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
@@ -23,7 +23,7 @@ func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
 		return
 	}
 	log.Printf("Write() done")
-	time.Sleep(sec * time.Second)
+	time.Sleep(sec*time.Second + 100*time.Millisecond)
 	r = waveout.Reset(h)
 	if r != 0 {
 		log.Printf("Reset() failed: %s", r.Error())
@@ -61,6 +61,11 @@ func stage1(h syscall.Handle) {
 	stage2(h, &hdr)
 }
 
+func cb(h syscall.Handle, msg, inst, param1, param2 uint32) uintptr {
+	log.Printf("cb: msg=%08x inst=%08x param1=%08x param2=%08x", msg, inst, param1, param2)
+	return 0
+}
+
 func main() {
 	p := waveout.WaveFormatEx{
 		FormatTag:      waveout.WAVE_FORMAT_PCM,
@@ -71,7 +76,7 @@ func main() {
 		BitsPerSample:  8,
 	}
 	var h syscall.Handle
-	r := waveout.Open(&h, waveout.WAVE_MAPPER, &p, 0, 0, waveout.CALLBACK_NULL)
+	r := waveout.Open(&h, waveout.WAVE_MAPPER, &p, 0, 0, waveout.CALLBACK_FUNCTION)
 	if r != 0 {
 		log.Printf("Open() failed: %s", r.Error())
 		return

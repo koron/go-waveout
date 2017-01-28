@@ -52,7 +52,7 @@ var (
 	procwaveOutBreakLoop       = modwinmm.NewProc("waveOutBreakLoop")
 )
 
-func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uint32, inst uint32, flag uint32) (result MMRESULT) {
+func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uintptr, inst uint32, flag uint32) (result MMRESULT) {
 	r0, _, _ := syscall.Syscall6(procwaveOutOpen.Addr(), 6, uintptr(unsafe.Pointer(handle)), uintptr(deviceID), uintptr(unsafe.Pointer(waveFormat)), uintptr(callback), uintptr(inst), uintptr(flag))
 	result = MMRESULT(r0)
 	return
