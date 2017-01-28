@@ -10,6 +10,17 @@ type WaveFormatEx struct {
 	Size           uint16
 }
 
+type WaveHdr struct {
+	Data          uintptr
+	BufferLength  uint32
+	BytesRecorded uint32
+	User          uintptr
+	Flags         uint32
+	Loops         uint32
+	Next          *WaveHdr
+	Reserved      uintptr
+}
+
 const (
 	WAVE_MAPPER = uint32(0xFFFFFFFF)
 
@@ -28,4 +39,10 @@ const (
 	WAVE_MAPPED_DEFAULT_COMMUNICATION_DEVICE = uint32(0x00000010)
 
 	WAVE_FORMAT_PCM = 0x0001
+
+	WHDR_DONE      = uint32(0x00000001)
+	WHDR_PREPARED  = uint32(0x00000002)
+	WHDR_BEGINLOOP = uint32(0x00000004)
+	WHDR_ENDLOOP   = uint32(0x00000008)
+	WHDR_INQUEUE   = uint32(0x00000010)
 )

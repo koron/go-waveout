@@ -6,3 +6,10 @@ package waveout
 //sys   Close(handle syscall.Handle) (result MMRESULT) = winmm.waveOutClose
 //sys   GetVolume(handle syscall.Handle, volume *uint32) (result MMRESULT) = winmm.waveOutGetVolume
 //sys   SetVolume(handle syscall.Handle, volume uint32) (result MMRESULT) = winmm.waveOutSetVolume
+//sys   PrepareHeader(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) = winmm.waveOutPrepareHeader
+//sys   UnprepareHeader(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) = winmm.waveOutUnprepareHeader
+//sys   Write(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) = winmm.waveOutWrite
+// sys  Pause(handle syscall.Handle) (result MMRESULT) = winmm.waveOutPause
+// sys  Restart(handle syscall.Handle) (result MMRESULT) = winmm.waveOutRestart
+// sys  Reset(handle syscall.Handle) (result MMRESULT) = winmm.waveOutReset
+// sys  BreakLoop(handle syscall.Handle) (result MMRESULT) = winmm.waveOutBreakLoop

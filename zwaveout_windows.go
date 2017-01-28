@@ -39,10 +39,13 @@ func errnoErr(e syscall.Errno) error {
 var (
 	modwinmm = windows.NewLazySystemDLL("winmm.dll")
 
-	procwaveOutOpen      = modwinmm.NewProc("waveOutOpen")
-	procwaveOutClose     = modwinmm.NewProc("waveOutClose")
-	procwaveOutGetVolume = modwinmm.NewProc("waveOutGetVolume")
-	procwaveOutSetVolume = modwinmm.NewProc("waveOutSetVolume")
+	procwaveOutOpen            = modwinmm.NewProc("waveOutOpen")
+	procwaveOutClose           = modwinmm.NewProc("waveOutClose")
+	procwaveOutGetVolume       = modwinmm.NewProc("waveOutGetVolume")
+	procwaveOutSetVolume       = modwinmm.NewProc("waveOutSetVolume")
+	procwaveOutPrepareHeader   = modwinmm.NewProc("waveOutPrepareHeader")
+	procwaveOutUnprepareHeader = modwinmm.NewProc("waveOutUnprepareHeader")
+	procwaveOutWrite           = modwinmm.NewProc("waveOutWrite")
 )
 
 func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uint32, inst uint32, flag uint32) (result MMRESULT) {
@@ -65,6 +68,24 @@ func GetVolume(handle syscall.Handle, volume *uint32) (result MMRESULT) {
 
 func SetVolume(handle syscall.Handle, volume uint32) (result MMRESULT) {
 	r0, _, _ := syscall.Syscall(procwaveOutSetVolume.Addr(), 2, uintptr(handle), uintptr(volume), 0)
+	result = MMRESULT(r0)
+	return
+}
+
+func PrepareHeader(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutPrepareHeader.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(header)), uintptr(size))
+	result = MMRESULT(r0)
+	return
+}
+
+func UnprepareHeader(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutUnprepareHeader.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(header)), uintptr(size))
+	result = MMRESULT(r0)
+	return
+}
+
+func Write(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutWrite.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(header)), uintptr(size))
 	result = MMRESULT(r0)
 	return
 }
