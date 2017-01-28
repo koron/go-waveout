@@ -43,28 +43,14 @@ var (
 	procwaveOutClose = modwinmm.NewProc("waveOutClose")
 )
 
-func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uint32, inst uint32, flag uint32) (result MMRESULT, err error) {
-	r0, _, e1 := syscall.Syscall6(procwaveOutOpen.Addr(), 6, uintptr(unsafe.Pointer(handle)), uintptr(deviceID), uintptr(unsafe.Pointer(waveFormat)), uintptr(callback), uintptr(inst), uintptr(flag))
+func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uint32, inst uint32, flag uint32) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall6(procwaveOutOpen.Addr(), 6, uintptr(unsafe.Pointer(handle)), uintptr(deviceID), uintptr(unsafe.Pointer(waveFormat)), uintptr(callback), uintptr(inst), uintptr(flag))
 	result = MMRESULT(r0)
-	if result == 0 {
-		if e1 != 0 {
-			err = errnoErr(e1)
-		} else {
-			err = syscall.EINVAL
-		}
-	}
 	return
 }
 
-func Close(handle syscall.Handle) (result MMRESULT, err error) {
-	r0, _, e1 := syscall.Syscall(procwaveOutClose.Addr(), 1, uintptr(handle), 0, 0)
+func Close(handle syscall.Handle) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutClose.Addr(), 1, uintptr(handle), 0, 0)
 	result = MMRESULT(r0)
-	if result == 0 {
-		if e1 != 0 {
-			err = errnoErr(e1)
-		} else {
-			err = syscall.EINVAL
-		}
-	}
 	return
 }

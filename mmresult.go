@@ -30,6 +30,12 @@ const (
 	MMSYSERR_NODRIVERCB   = MMRESULT(20)
 	MMSYSERR_MOREDATA     = MMRESULT(21)
 	MMSYSERR_LASTERROR    = MMRESULT(21)
+
+	WAVERR_BADFORMAT    = MMRESULT(32)
+	WAVERR_STILLPLAYING = MMRESULT(33)
+	WAVERR_UNPREPARED   = MMRESULT(34)
+	WAVERR_SYNC         = MMRESULT(35)
+	WAVERR_LASTERROR    = MMRESULT(35)
 )
 
 func (r MMRESULT) Error() string {
@@ -78,6 +84,14 @@ func (r MMRESULT) Error() string {
 		return "driver does not call DriverCallback"
 	case MMSYSERR_MOREDATA:
 		return "more data to be returned"
+	case WAVERR_BADFORMAT:
+		return "unsupported wave format"
+	case WAVERR_STILLPLAYING:
+		return "still something playing"
+	case WAVERR_UNPREPARED:
+		return "header not prepared"
+	case WAVERR_SYNC:
+		return "device is synchronous"
 	default:
 		return fmt.Sprintf("unknown error: %d", r)
 	}
