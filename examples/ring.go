@@ -13,6 +13,7 @@ import (
 const (
 	rate = 8000
 	freq = 400
+	sec = 2
 )
 
 func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
@@ -22,7 +23,7 @@ func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
 		return
 	}
 	log.Printf("Write() done")
-	time.Sleep(2 * time.Second)
+	time.Sleep(sec * time.Second)
 	r = waveout.Reset(h)
 	if r != 0 {
 		log.Printf("Reset() failed: %s", r.Error())
@@ -31,7 +32,7 @@ func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
 }
 
 func stage1(h syscall.Handle) {
-	d := make([]byte, rate*2)
+	d := make([]byte, rate*sec)
 	l := rate / freq
 	for i := range d {
 		if i%l < l/2 {
