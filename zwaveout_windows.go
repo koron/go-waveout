@@ -39,8 +39,10 @@ func errnoErr(e syscall.Errno) error {
 var (
 	modwinmm = windows.NewLazySystemDLL("winmm.dll")
 
-	procwaveOutOpen  = modwinmm.NewProc("waveOutOpen")
-	procwaveOutClose = modwinmm.NewProc("waveOutClose")
+	procwaveOutOpen      = modwinmm.NewProc("waveOutOpen")
+	procwaveOutClose     = modwinmm.NewProc("waveOutClose")
+	procwaveOutGetVolume = modwinmm.NewProc("waveOutGetVolume")
+	procwaveOutSetVolume = modwinmm.NewProc("waveOutSetVolume")
 )
 
 func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uint32, inst uint32, flag uint32) (result MMRESULT) {
@@ -51,6 +53,18 @@ func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, cal
 
 func Close(handle syscall.Handle) (result MMRESULT) {
 	r0, _, _ := syscall.Syscall(procwaveOutClose.Addr(), 1, uintptr(handle), 0, 0)
+	result = MMRESULT(r0)
+	return
+}
+
+func GetVolume(handle syscall.Handle, volume *uint32) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutGetVolume.Addr(), 2, uintptr(handle), uintptr(unsafe.Pointer(volume)), 0)
+	result = MMRESULT(r0)
+	return
+}
+
+func SetVolume(handle syscall.Handle, volume uint32) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutSetVolume.Addr(), 2, uintptr(handle), uintptr(volume), 0)
 	result = MMRESULT(r0)
 	return
 }
