@@ -46,6 +46,10 @@ var (
 	procwaveOutPrepareHeader   = modwinmm.NewProc("waveOutPrepareHeader")
 	procwaveOutUnprepareHeader = modwinmm.NewProc("waveOutUnprepareHeader")
 	procwaveOutWrite           = modwinmm.NewProc("waveOutWrite")
+	procwaveOutPause           = modwinmm.NewProc("waveOutPause")
+	procwaveOutRestart         = modwinmm.NewProc("waveOutRestart")
+	procwaveOutReset           = modwinmm.NewProc("waveOutReset")
+	procwaveOutBreakLoop       = modwinmm.NewProc("waveOutBreakLoop")
 )
 
 func Open(handle *syscall.Handle, deviceID uint32, waveFormat *WaveFormatEx, callback uint32, inst uint32, flag uint32) (result MMRESULT) {
@@ -86,6 +90,30 @@ func UnprepareHeader(handle syscall.Handle, header *WaveHdr, size uint32) (resul
 
 func Write(handle syscall.Handle, header *WaveHdr, size uint32) (result MMRESULT) {
 	r0, _, _ := syscall.Syscall(procwaveOutWrite.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(header)), uintptr(size))
+	result = MMRESULT(r0)
+	return
+}
+
+func Pause(handle syscall.Handle) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutPause.Addr(), 1, uintptr(handle), 0, 0)
+	result = MMRESULT(r0)
+	return
+}
+
+func Restart(handle syscall.Handle) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutRestart.Addr(), 1, uintptr(handle), 0, 0)
+	result = MMRESULT(r0)
+	return
+}
+
+func Reset(handle syscall.Handle) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutReset.Addr(), 1, uintptr(handle), 0, 0)
+	result = MMRESULT(r0)
+	return
+}
+
+func BreakLoop(handle syscall.Handle) (result MMRESULT) {
+	r0, _, _ := syscall.Syscall(procwaveOutBreakLoop.Addr(), 1, uintptr(handle), 0, 0)
 	result = MMRESULT(r0)
 	return
 }
