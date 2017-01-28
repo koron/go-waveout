@@ -10,8 +10,10 @@ import (
 	"github.com/koron/go-waveout"
 )
 
-var rate = 8000
-var freq = 400
+const (
+	rate = 8000
+	freq = 400
+)
 
 func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
 	r := waveout.Write(h, hdr, uint32(unsafe.Sizeof(*hdr)))
@@ -39,7 +41,7 @@ func stage1(h syscall.Handle) {
 		}
 	}
 	hdr := waveout.WaveHdr{
-		Data:         uintptr(unsafe.Pointer(&d)),
+		Data:         &d[0],
 		BufferLength: uint32(len(d)),
 		Flags:        uint32(waveout.WHDR_BEGINLOOP | waveout.WHDR_ENDLOOP),
 		Loops:        1,

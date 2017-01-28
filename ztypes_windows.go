@@ -11,7 +11,7 @@ type WaveFormatEx struct {
 }
 
 type WaveHdr struct {
-	Data          uintptr
+	Data          *byte
 	BufferLength  uint32
 	BytesRecorded uint32
 	User          uintptr
