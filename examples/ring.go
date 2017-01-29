@@ -23,7 +23,7 @@ func stage2(h syscall.Handle, hdr *waveout.WaveHdr) {
 		return
 	}
 	log.Printf("Write() done")
-	time.Sleep(sec*time.Second + 100*time.Millisecond)
+	time.Sleep(sec*time.Second + 10*time.Millisecond)
 	r = waveout.Reset(h)
 	if r != 0 {
 		log.Printf("Reset() failed: %s", r.Error())
