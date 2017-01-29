@@ -85,20 +85,11 @@ func (p *Player) AppendChunks(num, size int) error {
 
 // Write outputs PCM sound.
 func (p *Player) Write(b []byte) (n int, err error) {
-	i := 0
 	for len(b) > 0 {
 		// find a chunk which not in queue.
-		if i >= len(p.chunks) {
-			return n, ErrLessChunks
-		}
-		c := p.chunks[p.nextChunk]
-		i++
-		p.nextChunk++
-		if p.nextChunk >= len(p.chunks) {
-			p.nextChunk = 0
-		}
-		if c.wh.Flags&WHDR_INQUEUE != 0 {
-			continue
+		c, err := p.findFreeChunk()
+		if err != nil {
+			return n, err
 		}
 		// copy data to buffer of a chunk.
 		l := min(len(b), len(c.buf))
@@ -113,6 +104,22 @@ func (p *Player) Write(b []byte) (n int, err error) {
 		n += l
 	}
 	return n, nil
+}
+
+func (p *Player) findFreeChunk() (*chunk, error) {
+	c := p.chunks[p.nextChunk]
+	p.nextChunk++
+	if p.nextChunk >= len(p.chunks) {
+		p.nextChunk = 0
+	}
+	for {
+		if c.wh.Flags&WHDR_INQUEUE == 0 {
+			break
+		}
+		// FIXME: auto adjust.
+		time.Sleep(1 * time.Millisecond)
+	}
+	return c, nil
 }
 
 // Close closes a Player.
@@ -197,11 +204,12 @@ func (p *Player) Wait() error {
 		for _, c := range p.chunks {
 			if c.wh.Flags&WHDR_INQUEUE != 0 {
 				n++
+				break
 			}
 		}
 		if n == 0 {
 			return nil
 		}
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(1 * time.Millisecond)
 	}
 }
