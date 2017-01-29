@@ -103,6 +103,7 @@ func (p *Player) Write(b []byte) (n int, err error) {
 		// copy data to buffer of a chunk.
 		l := min(len(b), len(c.buf))
 		copy(c.buf[:l], b[:l])
+		c.wh.BufferLength = uint32(l)
 		b = b[l:]
 		// queue a chunk to output as sound.
 		r := Write(p.h, &c.wh, uint32(unsafe.Sizeof(c.wh)))
