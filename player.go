@@ -86,8 +86,7 @@ func (p *Player) AppendChunks(num, size int) error {
 // Write outputs PCM sound.
 func (p *Player) Write(b []byte) (n int, err error) {
 	for len(b) > 0 {
-		// find a chunk which not in queue.
-		c, err := p.findFreeChunk()
+		c, err := p.getNextChunk()
 		if err != nil {
 			return n, err
 		}
@@ -106,7 +105,10 @@ func (p *Player) Write(b []byte) (n int, err error) {
 	return n, nil
 }
 
-func (p *Player) findFreeChunk() (*chunk, error) {
+func (p *Player) getNextChunk() (*chunk, error) {
+	if len(p.chunks) == 0 {
+		return nil, ErrLessChunks
+	}
 	c := p.chunks[p.nextChunk]
 	p.nextChunk++
 	if p.nextChunk >= len(p.chunks) {
