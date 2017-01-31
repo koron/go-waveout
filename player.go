@@ -15,6 +15,7 @@ var (
 // Player is PCM player
 type Player struct {
 	h         syscall.Handle
+	d         time.Duration
 	chunks    []*chunk
 	nextChunk int
 }
@@ -42,7 +43,22 @@ func New(channels, samplesPerSec, bitsPerSample uint) (p *Player, err error) {
 	}
 	return &Player{
 		h: h,
+		d: time.Second / time.Duration(samplesPerSec * ba),
 	}, nil
+}
+
+// NewWithBuffers creates a new Player instance with buffers.
+func NewWithBuffers(channels, samplesPerSec, bitsPerSample uint, num, size int) (p *Player, err error) {
+	p, err = New(channels, samplesPerSec, bitsPerSample)
+	if err != nil {
+		return nil, err
+	}
+	err = p.AddBuffers(num, size)
+	if err != nil {
+		p.Close()
+		return nil, err
+	}
+	return p, nil
 }
 
 func min(a, b int) int {
@@ -52,8 +68,8 @@ func min(a, b int) int {
 	return b
 }
 
-// AppendChunk append a chunk/buffer to the Player.
-func (p *Player) AppendChunk(size int) error {
+// AddBuffer adds a buffer to the Player.
+func (p *Player) AddBuffer(size int) error {
 	buf := make([]byte, size)
 	c := &chunk{
 		wh: WaveHdr{
@@ -72,10 +88,10 @@ func (p *Player) AppendChunk(size int) error {
 	return nil
 }
 
-// AppendChunks appends multiple chunks/buffer to the player.
-func (p *Player) AppendChunks(num, size int) error {
+// AddBuffers adds multiple buffers to the player.
+func (p *Player) AddBuffers(num, size int) error {
 	for i := 0; i < num; i++ {
-		err := p.AppendChunk(size)
+		err := p.AddBuffer(size)
 		if err != nil {
 			return err
 		}
@@ -114,12 +130,17 @@ func (p *Player) getNextChunk() (*chunk, error) {
 	if p.nextChunk >= len(p.chunks) {
 		p.nextChunk = 0
 	}
+	d := p.d
 	for {
 		if c.wh.Flags&WHDR_INQUEUE == 0 {
 			break
 		}
-		// FIXME: auto adjust.
-		time.Sleep(1 * time.Millisecond)
+		// auto adjust.
+		d /= 2
+		if d < time.Millisecond {
+			d = time.Millisecond
+		}
+		time.Sleep(d)
 	}
 	return c, nil
 }
